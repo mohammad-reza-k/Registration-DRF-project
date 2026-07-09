@@ -16,7 +16,7 @@ class DepartmentViewlist(generics.ListCreateAPIView):
 class DepartmentDetailView(generics.RetrieveAPIView):
     queryset = Department.objects.all()
     serializer_class = DepartmentSerializser
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
     lookup_field = 'pk'
     
 class CustomTokenObtainPairView(TokenObtainPairView):
@@ -25,17 +25,19 @@ class CustomTokenObtainPairView(TokenObtainPairView):
 class StudentDetailView(generics.RetrieveAPIView):
     queryset = Student.objects.all()
     serializer_class = StudentSerialiser
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
     
     
 class OfferListView(generics.ListAPIView):
     serializer_class = CourseOfferSerialiser
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
     def get_queryset(self):
         student = self.request.user.student
         return CourseOffering.objects.filter(course__dep=student.dep)
 
-        
+# class StudentListView(generics.ListAPIView):
+#     queryset = Student.objects.all()
+#     serializer_class = StudentSerialiser     
 
     
     

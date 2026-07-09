@@ -26,11 +26,26 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         return token
 
 class StudentSerialiser(serializers.ModelSerializer):
-    
+    phone_numbers = serializers.SerializerMethodField()
     class Meta:
         model = Student
-        fields = "__all__"
+        fields = [
+            "first_name",
+            "last_name",
+            "gender", 
+            "student_number", 
+            "national_code", 
+            "date_of_birth", 
+            "entry_year", 
+            "dep",
+            "phone_numbers" 
+            ]
         
+        
+    def get_phone_numbers(self,obj):
+        phone = StudentPhone.objects.filter(stu=obj).all()
+        return [p.phone_number for p in phone] if phone else None
+    
 class CourseOfferSerialiser(serializers.ModelSerializer):
     class Meta:
         model = CourseOffering
@@ -45,25 +60,43 @@ class ProfessorSerialiser(serializers.ModelSerializer):
 class CourseSerialiser(serializers.ModelSerializer):
     
     class Meta:
-        model = Student
+        model = Course
         fields = "__all__"
-class StudentSerialiser(serializers.ModelSerializer):
+        
+class ClassSerialiser(serializers.ModelSerializer):
     
     class Meta:
-        model = Student
+        model = ClassSchedule
         fields = "__all__"
-class StudentSerialiser(serializers.ModelSerializer):
+        
+class ExamSerialiser(serializers.ModelSerializer):
     
     class Meta:
-        model = Student
+        model = ExamSchedule
         fields = "__all__"
-class StudentSerialiser(serializers.ModelSerializer):
+        
+class GradeSerialiser(serializers.ModelSerializer):
     
     class Meta:
-        model = Student
+        model = Grade
         fields = "__all__"
-class StudentSerialiser(serializers.ModelSerializer):
+        
+class EnrollmentSerialiser(serializers.ModelSerializer):
     
     class Meta:
-        model = Student
+        model = Enrollment
         fields = "__all__"
+
+class SemesterSerialiser(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Semester
+        fields = "__all__"
+        
+class PrerequisiteSerialiser(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Prerequisite
+        fields = "__all__"
+        
+    
