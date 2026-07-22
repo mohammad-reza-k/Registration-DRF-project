@@ -3,7 +3,8 @@ from .models import *
 from .serializer import *
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.permissions import IsAuthenticated
-
+from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework import generics
 
 class DepartmentViewlist(generics.ListCreateAPIView):
@@ -19,7 +20,6 @@ class DepartmentDetailView(generics.RetrieveAPIView):
     # permission_classes = [IsAuthenticated]
     lookup_field = 'pk'
             
-        
 class StudentDetailView(generics.RetrieveAPIView):
     queryset = Student.objects.all()
     serializer_class = StudentSerialiser
@@ -39,5 +39,21 @@ class OfferListView(generics.ListAPIView):
 
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer 
+        
+
+class StudentDashboardView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def get(self,request):
+        student = request.user.student
+        serializer = StudentSerialiser(student)
+
+        return Response(
+            {
+                "message": "Welcome",
+                "student":serializer.data
+            }
+        )
+
     
     

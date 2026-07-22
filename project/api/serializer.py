@@ -1,6 +1,7 @@
 from .models import *
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework.exceptions import AuthenticationFailed
 
 class DepartmentSerializser(serializers.ModelSerializer):
     def validate(self, data):
@@ -15,18 +16,9 @@ class DepartmentSerializser(serializers.ModelSerializer):
         fields = "__all__"
         
 
-class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
-    @classmethod
-    def get_token(cls, user):
-        token = super().get_token(user)
-
-        token['is_student'] = user.is_student
-        token['is_professor'] = user.is_professor
-
-        return token
-
 class StudentSerialiser(serializers.ModelSerializer):
     phone_numbers = serializers.SerializerMethodField()
+    dep = DepartmentSerializser(read_only=True)
     class Meta:
         model = Student
         fields = [
@@ -100,3 +92,24 @@ class PrerequisiteSerialiser(serializers.ModelSerializer):
         fields = "__all__"
         
     
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+
+        token['is_student'] = user.is_student
+        token['is_professor'] = user.is_professor
+
+        return token
+    
+    def validate(self, attrs):
+        data = super().validate(attrs)
+        if not self.user.is_student:
+            raise AuthenticationFailed(
+                "Only students can login here.")
+        
+        data["is_student"] = self.user.is_student
+        data["is_professor"] = self.user.is_professor
+        return data
+
+

@@ -11,6 +11,7 @@ urlpatterns = [
     path('offerlist/<int:pk>/',views.OfferListView.as_view(), name='offer_view'),
     
     path('login/',views.CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('student/dashboard/',views.StudentDashboardView.as_view(), name='student_dashboard'),
     path('refresh/',TokenRefreshView.as_view()),
 
 ]
