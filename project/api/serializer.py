@@ -13,7 +13,7 @@ class DepartmentSerializser(serializers.ModelSerializer):
     
     class Meta:
         model = Department
-        fields = "__all__"
+        fields = ["faculty_name"]
         
 
 class StudentSerialiser(serializers.ModelSerializer):
@@ -37,59 +37,63 @@ class StudentSerialiser(serializers.ModelSerializer):
     def get_phone_numbers(self,obj):
         phone = StudentPhone.objects.filter(stu=obj).all()
         return [p.phone_number for p in phone] if phone else None
-    
-class CourseOfferSerialiser(serializers.ModelSerializer):
-    class Meta:
-        model = CourseOffering
-        fields = "__all__"
-        
-class ProfessorSerialiser(serializers.ModelSerializer):
-    
-    class Meta:
-        model = Professor
-        fields = "__all__"
-        
-class CourseSerialiser(serializers.ModelSerializer):
-    
-    class Meta:
-        model = Course
-        fields = "__all__"
-        
-class ClassSerialiser(serializers.ModelSerializer):
-    
-    class Meta:
-        model = ClassSchedule
-        fields = "__all__"
-        
-class ExamSerialiser(serializers.ModelSerializer):
-    
-    class Meta:
-        model = ExamSchedule
-        fields = "__all__"
-        
-class GradeSerialiser(serializers.ModelSerializer):
-    
-    class Meta:
-        model = Grade
-        fields = "__all__"
-        
-class EnrollmentSerialiser(serializers.ModelSerializer):
-    
-    class Meta:
-        model = Enrollment
-        fields = "__all__"
 
 class SemesterSerialiser(serializers.ModelSerializer):
     
     class Meta:
         model = Semester
+        fields = ["term_name","start_date","end_date","is_active"]
+
+class CourseSerialiser(serializers.ModelSerializer):
+    dep = DepartmentSerializser(read_only=True)
+    class Meta:
+        model = Course
+        fields = ["name", "description", "course_type", "credits", "is_active","dep"]
+
+class CourseOfferingSerialiser(serializers.ModelSerializer):
+    course = CourseSerialiser(read_only=True)
+    sem = SemesterSerialiser(read_only=True)
+    class Meta:
+        model = CourseOffering
         fields = "__all__"
         
-class PrerequisiteSerialiser(serializers.ModelSerializer):
+# class ProfessorSerialiser(serializers.ModelSerializer):
     
-    class Meta:
-        model = Prerequisite
-        fields = "__all__"
+#     class Meta:
+#         model = Professor
+#         fields = "__all__"
+        
+        
+# class ClassSerialiser(serializers.ModelSerializer):
+    
+#     class Meta:
+#         model = ClassSchedule
+#         fields = "__all__"
+        
+# class ExamSerialiser(serializers.ModelSerializer):
+    
+#     class Meta:
+#         model = ExamSchedule
+#         fields = "__all__"
+        
+# class GradeSerialiser(serializers.ModelSerializer):
+    
+#     class Meta:
+#         model = Grade
+#         fields = "__all__"
+        
+# class EnrollmentSerialiser(serializers.ModelSerializer):
+    
+#     class Meta:
+#         model = Enrollment
+#         fields = "__all__"
+
+        
+# class PrerequisiteSerialiser(serializers.ModelSerializer):
+    
+#     class Meta:
+#         model = Prerequisite
+#         fields = "__all__"
         
     
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):

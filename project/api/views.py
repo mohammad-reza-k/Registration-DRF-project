@@ -11,7 +11,7 @@ class DepartmentViewlist(generics.ListCreateAPIView):
     
     queryset = Department.objects.all()
     serializer_class = DepartmentSerializser
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     
 class DepartmentDetailView(generics.RetrieveAPIView):
@@ -27,11 +27,18 @@ class StudentDetailView(generics.RetrieveAPIView):
     
     
 class OfferListView(generics.ListAPIView):
-    serializer_class = CourseOfferSerialiser
+    serializer_class = CourseOfferingSerialiser
     # permission_classes = [IsAuthenticated]
     def get_queryset(self):
         student = self.request.user.student
         return CourseOffering.objects.filter(course__dep=student.dep)
+    
+class AllOfferingListView(generics.ListAPIView):
+    serializer_class = CourseOfferingSerialiser
+    # permission_classes = [IsAuthenticated]
+    def get_queryset(self):
+        courses = CourseOffering.objects.filter(course__is_active=True, sem__is_active=True)
+        return courses
 
 # class StudentListView(generics.ListAPIView):
 #     queryset = Student.objects.all()
@@ -42,7 +49,7 @@ class CustomTokenObtainPairView(TokenObtainPairView):
         
 
 class StudentDashboardView(APIView):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
     
     def get(self,request):
         student = request.user.student

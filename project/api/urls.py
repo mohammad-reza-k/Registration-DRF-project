@@ -4,14 +4,15 @@ from rest_framework_simplejwt.views import TokenRefreshView
 
 
 urlpatterns = [
-    path('department/', views.DepartmentViewlist.as_view(), name='department_list'),
-    path('department/<int:pk>/',views.DepartmentDetailView.as_view(), name='department_detail_view'),
+    # path('department/', views.DepartmentViewlist.as_view(), name='department_list'),
+    # path('department/<int:pk>/',views.DepartmentDetailView.as_view(), name='department_detail_view'),
 
-    path('student/<int:pk>/',views.StudentDetailView.as_view(), name='student_view'),
-    path('offerlist/<int:pk>/',views.OfferListView.as_view(), name='offer_view'),
+    # path('student/<int:pk>/',views.StudentDetailView.as_view(), name='student_view'),
+    path('all_courses/',views.AllOfferingListView.as_view(), name='offer_view'),
     
     path('login/',views.CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('student/dashboard/',views.StudentDashboardView.as_view(), name='student_dashboard'),
+    # path('student/registration/',views..as_view(), name='student_registration'),
     path('refresh/',TokenRefreshView.as_view()),
 
 ]
