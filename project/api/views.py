@@ -52,7 +52,8 @@ class StudentDashboardView(APIView):
     # permission_classes = [IsAuthenticated]
     
     def get(self,request):
-        student = request.user.student
+        student = Student.objects.get(id=2)
+        # student = request.user.student
         serializer = StudentSerialiser(student)
 
         return Response(

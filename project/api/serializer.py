@@ -44,6 +44,11 @@ class SemesterSerialiser(serializers.ModelSerializer):
         model = Semester
         fields = ["term_name","start_date","end_date","is_active"]
 
+class ProfessorSerialiser(serializers.ModelSerializer):
+    class Meta:
+        model = Professor
+        fields = ["first_name","last_name"]
+        
 class CourseSerialiser(serializers.ModelSerializer):
     dep = DepartmentSerializser(read_only=True)
     class Meta:
@@ -53,15 +58,10 @@ class CourseSerialiser(serializers.ModelSerializer):
 class CourseOfferingSerialiser(serializers.ModelSerializer):
     course = CourseSerialiser(read_only=True)
     sem = SemesterSerialiser(read_only=True)
+    prof = ProfessorSerialiser(read_only=True)
     class Meta:
         model = CourseOffering
         fields = "__all__"
-        
-# class ProfessorSerialiser(serializers.ModelSerializer):
-    
-#     class Meta:
-#         model = Professor
-#         fields = "__all__"
         
         
 # class ClassSerialiser(serializers.ModelSerializer):
