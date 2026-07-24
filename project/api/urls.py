@@ -12,7 +12,7 @@ urlpatterns = [
     
     path('login/',views.CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('student/dashboard/',views.StudentDashboardView.as_view(), name='student_dashboard'),
-    # path('student/history/',views.StudentDashboardView.as_view(), name='student_dashboard'),
+    path('student/history/',views.StudentHistory.as_view(), name='student_history'),
     # path('student/registration/',views..as_view(), name='student_registration'),
     path('refresh/',TokenRefreshView.as_view()),
 

@@ -16,7 +16,7 @@ class DepartmentSerializser(serializers.ModelSerializer):
         fields = ["faculty_name"]
         
 
-class StudentSerialiser(serializers.ModelSerializer):
+class StudentDetailSerialiser(serializers.ModelSerializer):
     phone_numbers = serializers.SerializerMethodField()
     dep = DepartmentSerializser(read_only=True)
     class Meta:
@@ -62,8 +62,26 @@ class CourseOfferingSerialiser(serializers.ModelSerializer):
     class Meta:
         model = CourseOffering
         fields = "__all__"
-        
-        
+
+      
+class StudentHistorySerialiser(serializers.ModelSerializer):
+    course_name = serializers.CharField(source="offering.course.name",read_only=True)
+    credits = serializers.IntegerField(source="offering.course.credits",read_only=True)
+    semester = serializers.CharField(source="offering.sem.term_name",read_only=True)
+    professor_first_name = serializers.CharField(source="offering.prof.first_name",read_only=True)
+    professor_last_name = serializers.CharField(source="offering.prof.last_name",read_only=True)
+    class Meta:
+        model = Enrollment
+        fields = [
+            "enrollment_date",
+            "status",
+            "course_name",
+            "credits",
+            "semester",
+            "professor_first_name",
+            "professor_last_name",
+            "stu"
+            ]
 # class ClassSerialiser(serializers.ModelSerializer):
     
 #     class Meta:

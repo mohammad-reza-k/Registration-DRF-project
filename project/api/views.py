@@ -6,6 +6,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import generics
+from django.db.models import Q
+
 
 class DepartmentViewlist(generics.ListCreateAPIView):
     
@@ -22,7 +24,7 @@ class DepartmentDetailView(generics.RetrieveAPIView):
             
 class StudentDetailView(generics.RetrieveAPIView):
     queryset = Student.objects.all()
-    serializer_class = StudentSerialiser
+    serializer_class = StudentDetailSerialiser
     # permission_classes = [IsAuthenticated]
     
     
@@ -52,9 +54,9 @@ class StudentDashboardView(APIView):
     # permission_classes = [IsAuthenticated]
     
     def get(self,request):
-        student = Student.objects.get(id=2)
+        student = Student.objects.get(id=1)
         # student = request.user.student
-        serializer = StudentSerialiser(student)
+        serializer = StudentDetailSerialiser(student)
 
         return Response(
             {
@@ -63,5 +65,20 @@ class StudentDashboardView(APIView):
             }
         )
 
+class StudentHistory(APIView):
+    # permission_classes = [IsAuthenticated]
+    # serializer_class = StudentHistorySerialiser
+    def get_queryset(self, request):
+        # student = request.user.student.id
+        student = 1
+        return Enrollment.objects.filter(stu=student, status__in=["accepted", "not accepted"])
     
+    def get(self, request):
+        queryset = self.get_queryset(request)
+        
+        serializer = StudentHistorySerialiser(
+            queryset,
+            many=True
+        )
+        return Response({"data":serializer.data})
     
