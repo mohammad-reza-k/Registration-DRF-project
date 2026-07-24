@@ -18,9 +18,7 @@ class DepartmentDetailView(generics.RetrieveAPIView):
     serializer_class = DepartmentSerializser
     # permission_classes = [IsAuthenticated]
     lookup_field = 'pk'
-    
-class CustomTokenObtainPairView(TokenObtainPairView):
-    serializer_class = CustomTokenObtainPairSerializer         
+            
         
 class StudentDetailView(generics.RetrieveAPIView):
     queryset = Student.objects.all()
@@ -39,5 +37,7 @@ class OfferListView(generics.ListAPIView):
 #     queryset = Student.objects.all()
 #     serializer_class = StudentSerialiser     
 
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer 
     
     
