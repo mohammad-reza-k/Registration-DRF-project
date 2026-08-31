@@ -254,7 +254,8 @@ class Enrollment(models.Model):
     status = models.CharField(max_length=20, blank=True, null=True, default='temp',choices=STATUS_CHOICES)
     offering = models.ForeignKey(
         CourseOffering, 
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        related_name="enrollments"
     )
     stu = models.ForeignKey(
         Student, 
@@ -280,7 +281,7 @@ class ExamSchedule(models.Model):
     end_time = models.TimeField(blank=True, null=True)
     exam_date = models.DateField(blank=True, null=True)
     offering = models.ForeignKey(
-        CourseOffering, 
+        CourseOffering,     
         on_delete=models.CASCADE
     )
     dep = models.ForeignKey(

@@ -107,7 +107,6 @@ class RegistrationSerializer(serializers.Serializer):
     offering_id = serializers.IntegerField()
     
 class ClassSerialiser(serializers.ModelSerializer):
-    
     class Meta:
         model = ClassSchedule
         fields = "__all__"
