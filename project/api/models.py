@@ -1,9 +1,7 @@
 from django.db import models
 from django.db.models import Q, CheckConstraint, F, UniqueConstraint
-
-
 from django.contrib.auth.models import AbstractUser
-from django.db import models
+from django.db import models    
 
 class User(AbstractUser):
     is_student = models.BooleanField(default=False)
@@ -13,7 +11,6 @@ class Department(models.Model):
     # id = models.AutoField(primary_key=True)
     department_name = models.CharField(max_length=50, unique=True)
     faculty_name = models.CharField(max_length=50, blank=True, null=True)
-
 
     def __str__(self):
         return self.department_name

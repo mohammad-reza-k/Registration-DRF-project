@@ -3,6 +3,26 @@ from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework.exceptions import AuthenticationFailed
 
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+
+        token['is_student'] = user.is_student
+        token['is_professor'] = user.is_professor
+
+        return token
+    
+    def validate(self, attrs):
+        data = super().validate(attrs)
+        if not self.user.is_student:
+            raise AuthenticationFailed(
+                "Only students can login here.")
+        
+        data["is_student"] = self.user.is_student
+        data["is_professor"] = self.user.is_professor
+        return data
+
 class DepartmentSerializser(serializers.ModelSerializer):
     def validate(self, data):
         department_name = data.get('department_name')
@@ -82,56 +102,39 @@ class StudentHistorySerialiser(serializers.ModelSerializer):
             "professor_last_name",
             "stu"
             ]
-# class ClassSerialiser(serializers.ModelSerializer):
+
+class RegistrationSerializer(serializers.Serializer):
+    offering_id = serializers.IntegerField()
     
-#     class Meta:
-#         model = ClassSchedule
-#         fields = "__all__"
+class ClassSerialiser(serializers.ModelSerializer):
+    
+    class Meta:
+        model = ClassSchedule
+        fields = "__all__"
         
-# class ExamSerialiser(serializers.ModelSerializer):
+class ExamSerialiser(serializers.ModelSerializer):
     
-#     class Meta:
-#         model = ExamSchedule
-#         fields = "__all__"
+    class Meta:
+        model = ExamSchedule
+        fields = "__all__"
         
-# class GradeSerialiser(serializers.ModelSerializer):
+class GradeSerialiser(serializers.ModelSerializer):
     
-#     class Meta:
-#         model = Grade
-#         fields = "__all__"
+    class Meta:
+        model = Grade
+        fields = "__all__"
         
-# class EnrollmentSerialiser(serializers.ModelSerializer):
+class EnrollmentSerialiser(serializers.ModelSerializer):
     
-#     class Meta:
-#         model = Enrollment
-#         fields = "__all__"
+    class Meta:
+        model = Enrollment
+        fields = "__all__"
 
         
-# class PrerequisiteSerialiser(serializers.ModelSerializer):
+class PrerequisiteSerialiser(serializers.ModelSerializer):
     
-#     class Meta:
-#         model = Prerequisite
-#         fields = "__all__"
+    class Meta:
+        model = Prerequisite
+        fields = "__all__"
         
     
-class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
-    @classmethod
-    def get_token(cls, user):
-        token = super().get_token(user)
-
-        token['is_student'] = user.is_student
-        token['is_professor'] = user.is_professor
-
-        return token
-    
-    def validate(self, attrs):
-        data = super().validate(attrs)
-        if not self.user.is_student:
-            raise AuthenticationFailed(
-                "Only students can login here.")
-        
-        data["is_student"] = self.user.is_student
-        data["is_professor"] = self.user.is_professor
-        return data
-
-
