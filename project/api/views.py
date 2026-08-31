@@ -82,7 +82,7 @@ class StudentHistory(APIView):
     
 class StudentRegistration(APIView):
     permission_classes = [IsAuthenticated]
-    
+        
     def post(self, request):
         student = request.user.student
         serializer = RegistrationSerializer(data=request.data)
@@ -96,38 +96,13 @@ class StudentRegistration(APIView):
              
         enrollment = Enrollment.objects.create(
             stu=student,
-            offering=offering_id,
+            offering=offering,
         )
         return Response(
             { "message": "course added", "enrollmentID": enrollment.id},
-            status=status.HTTP_201_created  
+            status=status.HTTP_201_CREATED  
         )
-    
-    def delete(self, request, enrollment_id):
-        self.check_registraition_time()
-        student = request.user.student
-
-        enrollment = get_object_or_404(
-            Enrollment,
-            id=enrollment_id,
-            stu=student
-        )
-
-        if enrollment.status != "temp":
-            raise ValidationError(
-                "Only temporary courses can be deleted."
-            )
-
-        enrollment.status = "delete"
-        enrollment.save()
-
-        return Response(
-            {
-                "message": "Course deleted successfully."
-            },
-            status=status.HTTP_200_OK
-        )
-        
+            
     def put(self, request, enrollment_id):
         self.check_registraition_time()
         student = request.user.student
@@ -138,7 +113,7 @@ class StudentRegistration(APIView):
             stu=student
         )
 
-        if enrollment.status != "temp":
+        if enrollment.status not in ["temp","Temporary"]:
             raise ValidationError(
                 "Only temporary courses can become final."
             )
@@ -187,12 +162,12 @@ class StudentRegistration(APIView):
 
         current_schedules = ClassSchedule.objects.filter(
             offering__enrollments__stu=student,
-            offering__enrollments__status__in=["final", "temp"]
+            offering__enrollments__status__in=["final", "temp", "Temporary", "Final"]
         )
 
         current_exams = ExamSchedule.objects.filter(
             offering__enrollments__stu=student,
-            offering__enrollments__status__in=["final", "temp"]
+            offering__enrollments__status__in=["final", "temp","Temporary", "Final"]
         )
 
         for new_schedule in new_schedules:
@@ -254,7 +229,7 @@ class StudentRegistration(APIView):
         current_credits = Enrollment.objects.filter(
             stu=student,
             offering__sem=offering.sem,
-            status__in=["temp", "final"]
+            status__in=["temp", "final","Temporary", "Final"]
         ).aggregate(
             total=Sum("offering__course__credits")
         )["total"] or 0
@@ -280,6 +255,50 @@ class StudentRegistration(APIView):
                 "You have already passed this course."
             )
             
+    def check_registraition_time(self):
+        today = timezone.localdate()
+        semester = Semester.objects.get(
+            is_active=True
+        )
+        if today < semester.registration_start_date:
+            raise ValidationError(
+                "Registration has not started yet."
+            )
+
+        if today > semester.registration_end_date:
+            raise ValidationError(
+                "Registration period has ended."
+            )
+
+class DeleteRegistraition(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def delete(self, request, enrollment_id):
+        self.check_registraition_time()
+        student = request.user.student
+
+        enrollment = get_object_or_404(
+            Enrollment,
+            id=enrollment_id,
+            stu=student
+        )
+
+        if enrollment.status not in ["temp","Temporary"]:
+            raise ValidationError(
+                "Only temporary courses can be deleted."
+            )
+
+        enrollment.status = "delete"
+        enrollment.save()
+
+        return Response(
+            {
+                "message": "Course deleted successfully."
+            },
+            status=status.HTTP_200_OK
+        )
+        
+        
     def check_registraition_time(self):
         today = timezone.localdate()
         semester = Semester.objects.get(
