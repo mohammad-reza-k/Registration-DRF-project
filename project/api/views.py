@@ -52,7 +52,6 @@ class StudentDashboardView(APIView):
     permission_classes = [IsAuthenticated]
     
     def get(self,request):
-        # student = Student.objects.get(id=1)
         student = request.user.student
         serializer = StudentDetailSerialiser(student)
 
@@ -83,26 +82,51 @@ class StudentHistory(APIView):
 class StudentRegistration(APIView):
     permission_classes = [IsAuthenticated]
         
-    def post(self, request):
+    def post(self, request, offering_id):
         student = request.user.student
-        serializer = RegistrationSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        offering_id = serializer.validated_data["offering_id"]
+
         offering = get_object_or_404(
             CourseOffering,
             id=offering_id
         )
+
         self.validate_offering(student, offering)
-             
+
+        enrollment = Enrollment.objects.filter(
+            stu=student,
+            offering=offering
+        ).first()
+
+        if enrollment:
+            if enrollment.status == "delete":
+                enrollment.status = "temp"
+                enrollment.save(update_fields=["status"])
+
+                return Response(
+                    {
+                        "message": "Course added again",
+                        "enrollmentID": enrollment.id
+                    },
+                    status=status.HTTP_200_OK
+                )
+
+            raise ValidationError(
+                "You are already enrolled in this course."
+            )
+
         enrollment = Enrollment.objects.create(
             stu=student,
-            offering=offering,
+            offering=offering
         )
+
         return Response(
-            { "message": "course added", "enrollmentID": enrollment.id},
-            status=status.HTTP_201_CREATED  
+            {
+                "message": "Course added",
+                "enrollmentID": enrollment.id
+            },
+            status=status.HTTP_201_CREATED
         )
-            
+                
     def put(self, request, enrollment_id):
         self.check_registraition_time()
         student = request.user.student
@@ -257,7 +281,8 @@ class StudentRegistration(APIView):
             
     def check_registraition_time(self):
         today = timezone.localdate()
-        semester = Semester.objects.get(
+        semester = get_object_or_404(
+            Semester,
             is_active=True
         )
         if today < semester.registration_start_date:
@@ -301,7 +326,8 @@ class DeleteRegistraition(APIView):
         
     def check_registraition_time(self):
         today = timezone.localdate()
-        semester = Semester.objects.get(
+        semester = get_object_or_404(
+            Semester,
             is_active=True
         )
         if today < semester.registration_start_date:
@@ -313,3 +339,18 @@ class DeleteRegistraition(APIView):
             raise ValidationError(
                 "Registration period has ended."
             )
+
+class RegistrationList(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def get_queryset(self, request):
+            student = request.user.student.id
+            return Enrollment.objects.filter(stu=student, status__in=["final","Final","Temporary", "temp"])
+        
+    def get(self, request):
+            queryset = self.get_queryset(request)
+            serializer = StudentHistorySerialiser(
+                queryset,
+                many=True
+            )
+            return Response(serializer.data)

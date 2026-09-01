@@ -42,6 +42,7 @@ class StudentDetailSerialiser(serializers.ModelSerializer):
     class Meta:
         model = Student
         fields = [
+            "id",
             "first_name",
             "last_name",
             "gender", 
@@ -93,6 +94,7 @@ class StudentHistorySerialiser(serializers.ModelSerializer):
     class Meta:
         model = Enrollment
         fields = [
+            "id",
             "enrollment_date",
             "status",
             "course_name",
@@ -103,8 +105,7 @@ class StudentHistorySerialiser(serializers.ModelSerializer):
             "stu"
             ]
 
-class RegistrationSerializer(serializers.Serializer):
-    offering_id = serializers.IntegerField()
+
     
 class ClassSerialiser(serializers.ModelSerializer):
     class Meta:
